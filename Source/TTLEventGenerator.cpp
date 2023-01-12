@@ -89,6 +89,23 @@ void TTLEventGenerator::updateSettings()
 
 }
 
+void TTLEventGenerator::parameterValueChanged(Parameter* param)
+{
+   if (param->getName().equalsIgnoreCase("manual_trigger"))
+   {
+      shouldTriggerEvent = true;
+      LOGD("Event was manually triggered"); // log message
+   }
+   else if(param->getName().equalsIgnoreCase("interval"))
+   {
+      eventIntervalMs = (float)param->getValue();
+   }
+   else if(param->getName().equalsIgnoreCase("ttl_line"))
+   {
+      outputLine = (int)param->getValue();
+   }
+}
+
 bool TTLEventGenerator::startAcquisition()
 {
    counter = 0;
@@ -99,47 +116,80 @@ bool TTLEventGenerator::startAcquisition()
 
 void TTLEventGenerator::process(AudioBuffer<float>& buffer)
 {
-    // loop through the streams
-    for (auto stream : getDataStreams())
-    {
-       // Only generate on/off event for the first data stream
-       if(stream == getDataStreams()[0])
-       {
-          int totalSamples = getNumSamplesInBlock(stream->getStreamId());
-          uint64 startSampleForBlock = getFirstSampleNumberForBlock(stream->getStreamId());
+   // loop through the streams
+   for (auto stream : getDataStreams())
+   {
+      // Only generate on/off event for the first data stream
+      if(stream == getDataStreams()[0])
+      {
 
-          int eventIntervalInSamples = (int) stream->getSampleRate();
+         int totalSamples = getNumSamplesInBlock(stream->getStreamId());
+         uint64 startSampleForBlock = getFirstSampleNumberForBlock(stream->getStreamId());
 
-          for (int i = 0; i < totalSamples; i++)
-          {
-             counter++;
+         int eventIntervalInSamples;
 
-             if (counter == eventIntervalInSamples)
-             {
+         if (eventIntervalMs > 0)
+         eventIntervalInSamples = (int) stream->getSampleRate() * eventIntervalMs / 2 / 1000;
+         else
+            eventIntervalInSamples = (int)stream->getSampleRate() * 100 / 2 / 1000;
 
-                state = !state;
-                 
-                int outputLine = 0;
+         if (shouldTriggerEvent)
+         {
 
-                // add on or off event at the correct offset
-                TTLEventPtr eventPtr = TTLEvent::createTTLEvent(ttlChannel,
-                 startSampleForBlock + i,
-                 outputLine,
-                 state);
+            // add an ON event at the first sample.
+            TTLEventPtr eventPtr = TTLEvent::createTTLEvent(ttlChannel,
+               startSampleForBlock,
+               outputLine, true);
 
-                addEvent(eventPtr, i);
+            addEvent(eventPtr, 0);
 
-                // reset counter
-                counter = 0;
+            shouldTriggerEvent = false;
+            eventWasTriggered = true;
+            triggeredEventCounter = 0;
+         }
 
-             }
+         for (int i = 0; i < totalSamples; i++)
+         {
+            counter++;
 
-             // extra check
-             if (counter > eventIntervalInSamples)
-                counter = 0;
-          }
-       }
-    }
+            if (eventWasTriggered)
+               triggeredEventCounter++;
+
+            if (triggeredEventCounter == eventIntervalInSamples)
+            {
+               // add off event at the correct offset
+               TTLEventPtr eventPtr = TTLEvent::createTTLEvent(ttlChannel,
+                  startSampleForBlock + i,
+                  outputLine, false);
+
+               addEvent(eventPtr, i);
+
+               eventWasTriggered = false;
+               triggeredEventCounter = 0;
+            }
+
+            if (counter == eventIntervalInSamples && eventIntervalMs > 0)
+            {
+
+               state = !state;
+
+               // add on or off event at the correct offset
+               TTLEventPtr eventPtr = TTLEvent::createTTLEvent(ttlChannel,
+                  startSampleForBlock + i,
+                  outputLine, state);
+
+               addEvent(eventPtr, i);
+
+               counter = 0;
+
+            }
+
+            if (counter > eventIntervalInSamples)
+               counter = 0;
+         }
+      }
+   }
+
 }
 
 
