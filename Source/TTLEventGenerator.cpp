@@ -47,16 +47,72 @@ AudioProcessorEditor* TTLEventGenerator::createEditor()
 
 void TTLEventGenerator::updateSettings()
 {
+    // create and add a TTL channel to the first data stream
+    EventChannel::Settings settings{
+            EventChannel::Type::TTL,
+            "TTL Event Generator Output",
+            "Default TTL event channel",
+            "ttl.events",
+            dataStreams[0]
+    };
 
+    ttlChannel = new EventChannel(settings);
+    eventChannels.add(ttlChannel); // this pointer is now owned by the eventChannels array
+    ttlChannel->addProcessor(processorInfo.get()); // make sure the channel knows about this processor
 
 }
 
+bool TTLEventGenerator::startAcquisition()
+{
+   counter = 0;
+   state = false;
+
+   return true;
+}
 
 void TTLEventGenerator::process(AudioBuffer<float>& buffer)
 {
+    // loop through the streams
+    for (auto stream : getDataStreams())
+    {
+       // Only generate on/off event for the first data stream
+       if(stream == getDataStreams()[0])
+       {
+          int totalSamples = getNumSamplesInBlock(stream->getStreamId());
+          uint64 startSampleForBlock = getFirstSampleNumberForBlock(stream->getStreamId());
 
-    checkForEvents(true);
+          int eventIntervalInSamples = (int) stream->getSampleRate();
 
+          for (int i = 0; i < totalSamples; i++)
+          {
+             counter++;
+
+             if (counter == eventIntervalInSamples)
+             {
+
+                state = !state;
+                 
+                int outputLine = 0;
+
+                // add on or off event at the correct offset
+                TTLEventPtr eventPtr = TTLEvent::createTTLEvent(ttlChannel,
+                 startSampleForBlock + i,
+                 outputLine,
+                 state);
+
+                addEvent(eventPtr, i);
+
+                // reset counter
+                counter = 0;
+
+             }
+
+             // extra check
+             if (counter > eventIntervalInSamples)
+                counter = 0;
+          }
+       }
+    }
 }
 
 

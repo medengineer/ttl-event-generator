@@ -47,6 +47,9 @@ public:
 	/** Defines the functionality of the processor.
 		The process method is called every time a new data buffer is available.
 		Visualizer plugins typically use this method to send data to the canvas for display purposes */
+    
+    bool startAcquisition() override;
+    
 	void process(AudioBuffer<float>& buffer) override;
 
 	/** Handles events received by the processor
@@ -71,6 +74,11 @@ public:
 		Parameter objects*/
 	void loadCustomParametersFromXml(XmlElement* parentElement) override;
 
+private:
+    EventChannel* ttlChannel; // local pointer to TTL output channel
+    
+    int counter = 0; // counts the total number of incoming samples
+    bool state = false; // holds the state of the current TTL line (on or off)
 };
 
 #endif
