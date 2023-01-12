@@ -26,9 +26,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
 TTLEventGenerator::TTLEventGenerator()
-    : GenericProcessor("TTL Event Generator")
+   : GenericProcessor("TTL Event Generator")
 {
-
+      // Event frequency
+      addFloatParameter(Parameter::GLOBAL_SCOPE,  // parameter scope
+                  "interval",              // parameter name
+                  "Interval (in ms) for automated event generation (0 ms = off)",  // parameter description
+                  1000.0f,                  // default value
+                  0.0f,                     // minimum value
+                  5000.0f,                  // maximum value
+                  50.0f);                   // step size
 }
 
 

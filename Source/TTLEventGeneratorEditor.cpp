@@ -26,6 +26,9 @@ TTLEventGeneratorEditor::TTLEventGeneratorEditor(GenericProcessor* parentNode)
     : GenericEditor(parentNode)
 {
 
-    desiredWidth = 150;
+    desiredWidth = 180;
+    
+    // event frequency slider
+    addSliderParameterEditor("interval", 100, 25); // parameter name, x pos, y pos
 
 }
