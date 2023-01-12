@@ -25,20 +25,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <EditorHeaders.h>
 
-class ProcessorPluginEditor : public GenericEditor
+class TTLEventGeneratorEditor : public GenericEditor
 {
 public:
 
 	/** Constructor */
-	ProcessorPluginEditor(GenericProcessor* parentNode);
+	TTLEventGeneratorEditor(GenericProcessor* parentNode);
 
 	/** Destructor */
-	~ProcessorPluginEditor() { }
+	~TTLEventGeneratorEditor() { }
 
 private:
 
 	/** Generates an assertion if this class leaks */
-	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(ProcessorPluginEditor);
+	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TTLEventGeneratorEditor);
 };
 
 #endif // PROCESSORPLUGINEDITOR_H_DEFINED

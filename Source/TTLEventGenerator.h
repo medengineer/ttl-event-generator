@@ -26,14 +26,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <ProcessorHeaders.h>
 
 
-class ProcessorPlugin : public GenericProcessor
+class TTLEventGenerator : public GenericProcessor
 {
 public:
 	/** The class constructor, used to initialize any members. */
-	ProcessorPlugin();
+	TTLEventGenerator();
 
 	/** The class destructor, used to deallocate memory */
-	~ProcessorPlugin();
+	~TTLEventGenerator();
 
 	/** If the processor has a custom editor, this method must be defined to instantiate it. */
 	AudioProcessorEditor* createEditor() override;
