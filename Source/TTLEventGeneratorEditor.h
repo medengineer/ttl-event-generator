@@ -25,6 +25,33 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <EditorHeaders.h>
 
+#include "TTLEventGenerator.h"
+
+class ManualTriggerButton : public ParameterEditor,
+   public Button::Listener
+{
+public:
+
+   /** Constructor */
+   ManualTriggerButton(Parameter* param);
+
+   /** Destructor*/
+   virtual ~ManualTriggerButton() { }
+
+   /** Respond to trigger button clicks*/
+   void buttonClicked(Button* label) override;
+
+   /** Update view of the parameter editor component*/
+   void updateView() {};
+
+   /** Sets component layout*/
+   void resized() override;
+
+private:
+   std::unique_ptr<UtilityButton> triggerButton;
+};
+
+
 class TTLEventGeneratorEditor : public GenericEditor
 {
 public:

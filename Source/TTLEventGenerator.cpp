@@ -50,6 +50,12 @@ TTLEventGenerator::TTLEventGenerator()
                   5000.0f,                  // maximum value
                   50.0f);                   // step size
     
+    // Parameter for manually generating events
+    addStringParameter(Parameter::GLOBAL_SCOPE, // parameter scope
+                       "manual_trigger",        // parameter name
+                       "Used to notify processor of manually triggered TTL events",  // parameter description
+                       String());               // default value
+    
 }
 
 

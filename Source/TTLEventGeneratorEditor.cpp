@@ -22,6 +22,26 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "TTLEventGeneratorEditor.h"
 
+ManualTriggerButton::ManualTriggerButton(Parameter* param)
+     : ParameterEditor(param)
+{
+   triggerButton = std::make_unique<UtilityButton>("Trigger", Font("Fira Code", "Regular", 12.0f)); // button text, font to use
+   triggerButton->addListener(this); // add listener to the button
+   addAndMakeVisible(triggerButton.get());  // add the button to the editor and make it visible
+
+   setBounds(0, 0, 70, 20); // set the bounds of custom parameter editor
+}
+
+void ManualTriggerButton::buttonClicked(Button* b)
+{
+   param->setNextValue(triggerButton->getLabel());
+}
+
+void ManualTriggerButton::resized()
+{
+   triggerButton->setBounds(0, 0, 70, 20);
+}
+
 TTLEventGeneratorEditor::TTLEventGeneratorEditor(GenericProcessor* parentNode) 
     : GenericEditor(parentNode)
 {
@@ -33,5 +53,9 @@ TTLEventGeneratorEditor::TTLEventGeneratorEditor(GenericProcessor* parentNode)
     
     // event frequency slider
     addSliderParameterEditor("interval", 100, 25); // parameter name, x pos, y pos
+    
+    // custom button parameter editor
+    Parameter* manualTrigger = parentNode->getParameter("manual_trigger");
+    addCustomParameterEditor(new ManualTriggerButton(manualTrigger), 60, 95);
 
 }
