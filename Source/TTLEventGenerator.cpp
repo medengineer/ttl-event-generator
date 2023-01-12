@@ -28,6 +28,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 TTLEventGenerator::TTLEventGenerator()
    : GenericProcessor("TTL Event Generator")
 {
+    // Array of selectable TTL lines
+    StringArray outputs;
+    for(int i = 1; i <= 8; i++)
+       outputs.add(String(i));
+
+    // Event output line
+    addCategoricalParameter(Parameter::GLOBAL_SCOPE, // parameter scope
+                            "ttl_line",              // parameter name
+                            "Event output line",     // parameter description
+                             outputs,                // available values
+                             0);                     // index of default value
+    
+    
       // Event frequency
       addFloatParameter(Parameter::GLOBAL_SCOPE,  // parameter scope
                   "interval",              // parameter name
@@ -36,6 +49,7 @@ TTLEventGenerator::TTLEventGenerator()
                   0.0f,                     // minimum value
                   5000.0f,                  // maximum value
                   50.0f);                   // step size
+    
 }
 
 

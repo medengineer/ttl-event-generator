@@ -28,6 +28,9 @@ TTLEventGeneratorEditor::TTLEventGeneratorEditor(GenericProcessor* parentNode)
 
     desiredWidth = 180;
     
+    // event output line
+    addComboBoxParameterEditor("ttl_line", 10, 25); // parameter name, x pos, y pos
+    
     // event frequency slider
     addSliderParameterEditor("interval", 100, 25); // parameter name, x pos, y pos
 
